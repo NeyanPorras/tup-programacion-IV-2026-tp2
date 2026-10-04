@@ -177,6 +177,89 @@ vez validado y lo reemplazan en el request.
 De este modo la conversión ocurre en un solo lugar, en el borde de entrada, y
 los handlers reciben números sin tener que convertir ni verificar nada.
 
+## Endpoints
+
+| Método   | Ruta               | Descripción                       | Éxito |
+| -------- | ------------------ | --------------------------------- | ----- |
+| `POST`   | `/rectangulos`     | Crea un rectángulo                | `201` |
+| `GET`    | `/rectangulos`     | Lista todos los rectángulos       | `200` |
+| `GET`    | `/rectangulos/:id` | Obtiene un rectángulo por id      | `200` |
+| `PUT`    | `/rectangulos/:id` | Reemplaza los lados de un rectángulo | `200` |
+| `DELETE` | `/rectangulos/:id` | Elimina un rectángulo             | `200` |
+
+El cuerpo de las solicitudes de creación y modificación contiene únicamente
+`ladoA` y `ladoB`. Las respuestas incluyen además `id`, `perimetro` y
+`superficie`.
+
+Todas las respuestas, de éxito y de error, se devuelven en JSON. Los errores de
+validación tienen la forma `{ "errores": [...] }`, con un elemento por regla
+incumplida; los demás errores, `{ "error": "<mensaje>" }`.
+
+## Códigos de estado
+
+| Código | Cuándo se usa                                                |
+| ------ | ------------------------------------------------------------ |
+| `200`  | Consulta, modificación o eliminación exitosa                 |
+| `201`  | Creación exitosa                                             |
+| `400`  | Entrada inválida en el cuerpo o en el parámetro `id`         |
+| `404`  | El rectángulo solicitado no existe                           |
+| `500`  | Error al operar contra la base de datos                      |
+
+La distinción entre `400` y `404` es deliberada: `400` indica que la solicitud
+está mal formada y volver a enviarla igual fallará siempre; `404` indica que la
+solicitud es válida pero el recurso no existe. Un id como `1abc` es un `400`
+—no es un identificador— mientras que un id como `99999` es un `404`.
+
+El `500` se reserva para fallas de la base de datos. Las consultas se ejecutan
+dentro de `try`/`catch` y el detalle del error se registra en el servidor, sin
+exponerlo en la respuesta: el cliente no puede corregir una falla de
+infraestructura, y el mensaje interno podría revelar información del esquema.
+
+## Decisiones con alternativas válidas
+
+Las siguientes decisiones admiten más de una solución razonable. Se documenta la
+adoptada y su fundamento.
+
+**`DELETE` responde `200` con un mensaje de confirmación** en lugar de
+`204 No Content`. Se eligió una respuesta explícita para que el resultado sea
+verificable desde el archivo `.http`, donde un cuerpo vacío resulta ambiguo al
+revisar los resultados.
+
+Tampoco devuelve el rectángulo eliminado, porque en ese punto la fila ya no
+existe. Recuperarla exigiría un `SELECT` previo al `DELETE`, y la información no
+le aporta nada al cliente que acaba de pedir su eliminación.
+
+**El `PUT` construye la respuesta con los datos de la solicitud** en lugar de
+volver a leer la fila modificada. Es seguro porque el handler solo llega a ese
+punto cuando `affectedRows` es mayor que cero, es decir, cuando la escritura
+efectivamente ocurrió. La alternativa —un `SELECT` posterior al `UPDATE`—
+devolvería el estado real de la base de forma más fiel, al costo de una consulta
+adicional por cada modificación.
+
+La existencia del recurso se verifica mediante `affectedRows` y no con una
+consulta previa, de modo que una sola operación resuelve la modificación y la
+detección del `404`. Se usa `affectedRows` y no `changedRows`, porque este
+último vale cero cuando la modificación no altera ningún valor —al enviar los
+mismos lados que ya estaban almacenados— y haría responder `404` sobre un
+recurso que sí existe.
+
+**El `PUT` exige `ladoA` y `ladoB` completos.** `PUT` tiene semántica de
+reemplazo total del recurso, por lo que no se aceptan modificaciones parciales.
+Modificar un solo lado correspondería a `PATCH`, que no se implementó por no ser
+requerido por el enunciado.
+
+**No se validan los parámetros de consulta**, porque esta API no implementa
+ninguno: el enunciado no requiere filtrar ni paginar rectángulos, y no se
+incorporaron consultas que no estén pedidas. Un parámetro de consulta
+desconocido se ignora, siguiendo la convención de HTTP. Si en el futuro se
+agregara un filtro, su validación se sumaría a `validators.js` junto con el
+resto de las reglas.
+
+**Los errores de validación se devuelven todos juntos**, en un arreglo, en lugar
+de informar el primero y detenerse. El cliente recibe así todos los problemas de
+su solicitud en una sola respuesta, en vez de descubrirlos de a uno. Dentro de
+cada campo, en cambio, se informa un único error gracias a `.bail()`.
+
 ## Cómo ejecutar
 
 Crear la base de datos y la tabla:
