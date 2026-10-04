@@ -1,0 +1,212 @@
+@url = http://localhost:3000
+
+# Las peticiones dependen del orden: las tres primeras crean las tareas
+# con id 1, 2 y 3 que usa el resto del archivo. Para repetir la corrida
+# desde cero, volver a crear la tabla con: npm run db
+
+### Crear una tarea pendiente, sin enviar el estado (201)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "Comprar pan"
+}
+
+### Crear una tarea completada (201)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "Estudiar programación",
+  "completada": true
+}
+
+### Crear una tarea con espacios de mas, se guarda normalizada (201)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "   Pasear    al perro   ",
+  "completada": false
+}
+
+### Crear con nombre duplicado exacto (409)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "Comprar pan"
+}
+
+### Crear con nombre duplicado en mayusculas y con espacios (409)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "  COMPRAR   PAN  "
+}
+
+### Crear con nombre duplicado sin la tilde (409)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "Estudiar programacion"
+}
+
+### Crear sin nombre (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "completada": false
+}
+
+### Crear con nombre vacio (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "    "
+}
+
+### Crear con nombre que no es texto (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": 123
+}
+
+
+### Crear con estado como texto (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "Lavar el auto",
+  "completada": "true"
+}
+
+### Crear con estado numerico (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{
+  "nombre": "Lavar el auto",
+  "completada": 1
+}
+
+### Crear sin body (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+### Crear con un JSON mal formado (400)
+POST {{url}}/tareas
+Content-Type: application/json
+
+{ "nombre": "Lavar el auto", }
+
+### Listar todas las tareas (200)
+GET {{url}}/tareas
+
+### Listar solo las completadas (200)
+GET {{url}}/tareas?completada=true
+
+### Listar solo las pendientes (200)
+GET {{url}}/tareas?completada=false
+
+### Filtrar con un estado no admitido (400)
+GET {{url}}/tareas?completada=banana
+
+### Filtrar con un valor numerico, no admitido (400)
+GET {{url}}/tareas?completada=1
+
+### Filtrar repitiendo el parametro (400)
+GET {{url}}/tareas?completada=true&completada=false
+
+### Filtrar con un parametro desconocido (400)
+GET {{url}}/tareas?completado=true
+
+### Obtener una tarea por id (200)
+GET {{url}}/tareas/1
+
+### Obtener una tarea inexistente (404)
+GET {{url}}/tareas/999
+
+### Obtener con id no numerico (400)
+GET {{url}}/tareas/1abc
+
+### Marcar una tarea como completada (200)
+PUT {{url}}/tareas/1
+Content-Type: application/json
+
+{
+  "nombre": "Comprar pan",
+  "completada": true
+}
+
+### Renombrar una tarea (200)
+PUT {{url}}/tareas/3
+Content-Type: application/json
+
+{
+  "nombre": "Pasear al gato",
+  "completada": false
+}
+
+### Actualizar usando el nombre de otra tarea (409)
+PUT {{url}}/tareas/3
+Content-Type: application/json
+
+{
+  "nombre": "comprar pan",
+  "completada": false
+}
+
+### Actualizar sin enviar el estado (400)
+PUT {{url}}/tareas/1
+Content-Type: application/json
+
+{
+  "nombre": "Comprar pan"
+}
+
+### Actualizar con estado invalido (400)
+PUT {{url}}/tareas/1
+Content-Type: application/json
+
+{
+  "nombre": "Comprar pan",
+  "completada": "si"
+}
+
+### Actualizar una tarea inexistente (404)
+PUT {{url}}/tareas/999
+Content-Type: application/json
+
+{
+  "nombre": "Regar las plantas",
+  "completada": false
+}
+
+### Actualizar con id invalido (400)
+PUT {{url}}/tareas/1abc
+Content-Type: application/json
+
+{
+  "nombre": "Regar las plantas",
+  "completada": false
+}
+
+### Eliminar una tarea (200)
+DELETE {{url}}/tareas/2
+
+### Eliminar la misma tarea otra vez (404)
+DELETE {{url}}/tareas/2
+
+### Eliminar con id invalido (400)
+DELETE {{url}}/tareas/1abc
+
+### Consultar una ruta que no existe (404)
+GET {{url}}/proyectos

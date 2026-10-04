@@ -1,0 +1,12 @@
+CREATE DATABASE IF NOT EXISTS tp2_ejercicio2;
+
+USE tp2_ejercicio2;
+
+DROP TABLE IF EXISTS tareas;
+
+CREATE TABLE tareas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_es_0900_ai_ci NOT NULL,
+  completada BOOLEAN NOT NULL DEFAULT FALSE,
+  UNIQUE KEY uk_tareas_nombre (nombre)
+);
