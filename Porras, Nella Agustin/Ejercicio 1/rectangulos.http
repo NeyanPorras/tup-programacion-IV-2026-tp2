@@ -1,0 +1,126 @@
+@url = http://localhost:3000
+
+### Crear un rectangulo (201)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": 5,
+  "ladoB": 5
+}
+
+### Crear enviando perimetro (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": 5,
+  "ladoB": 5,
+  "perimetro": 20
+}
+
+### Crear enviando superficie (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": 5,
+  "ladoB": 5,
+  "superficie": 25
+}
+
+### Crear con ladoA negativa (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": -2,
+  "ladoB": 5
+}
+
+### Crear con ladoB en cero (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": 5,
+  "ladoB": 0
+}
+
+### Crear sin la clave ladoB (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": 5
+}
+
+### Crear con ladoA como string (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ladoA": "10",
+  "ladoB": 5
+}
+
+### Crear sin body (400)
+POST {{url}}/rectangulos
+Content-Type: application/json
+
+### Listar todos (200)
+GET {{url}}/rectangulos
+
+### Obtener un rectangulo por id (200)
+GET {{url}}/rectangulos/1
+
+### Obtener un rectangulo inexistente (404)
+GET {{url}}/rectangulos/999
+
+### Obtener con id no numerico (400)
+GET {{url}}/rectangulos/1abc
+
+### Actualizar un rectangulo (200)
+PUT {{url}}/rectangulos/2
+Content-Type: application/json
+
+{
+  "ladoA": 10,
+  "ladoB": 8
+}
+
+### Actualizar con id invalido (400)
+PUT {{url}}/rectangulos/2s
+Content-Type: application/json
+
+{
+  "ladoA": 10,
+  "ladoB": 8
+}
+
+### Actualizar un rectangulo inexistente (404)
+PUT {{url}}/rectangulos/999
+Content-Type: application/json
+
+{
+  "ladoA": 10,
+  "ladoB": 8
+}
+
+### Actualizar con valores invalidos (400)
+PUT {{url}}/rectangulos/2
+Content-Type: application/json
+
+{
+  "ladoA": -10,
+  "ladoB": 8
+}
+
+### Eliminar un rectangulo (200)
+DELETE {{url}}/rectangulos/1
+
+### Eliminar el mismo rectangulo otra vez (404)
+DELETE {{url}}/rectangulos/1
+
+### Eliminar con id invalido (400)
+DELETE {{url}}/rectangulos/3s
