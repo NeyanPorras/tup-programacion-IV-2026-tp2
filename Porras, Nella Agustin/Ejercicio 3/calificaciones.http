@@ -1,0 +1,468 @@
+@url = http://localhost:3000
+
+# Las peticiones dependen del orden: primero se crean las materias con
+# id 1, 2 y 3, y despues las calificaciones con id 1, 2 y 3. Para repetir
+# la corrida desde cero, volver a crear las tablas con: npm run db
+
+# ---------------------------- MATERIAS ----------------------------
+
+### Crear la materia 1 (201)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "Programación IV"
+}
+
+### Crear la materia 2 (201)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "Base de Datos II"
+}
+
+### Crear la materia 3, con espacios de mas que se normalizan (201)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "   Inglés    Técnico  "
+}
+
+### Crear una materia con nombre duplicado (409)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "Programación IV"
+}
+
+### Crear una materia duplicada en minusculas y sin tilde (409)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "programacion iv"
+}
+
+### Crear una materia sin nombre (400)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+}
+
+### Crear una materia con nombre vacio (400)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "   "
+}
+
+### Crear una materia con nombre que no es texto (400)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": 4
+}
+
+### Crear una materia con nombre de mas de 100 caracteres (400)
+POST {{url}}/materias
+Content-Type: application/json
+
+{
+  "nombre": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+
+### Listar las materias (200)
+GET {{url}}/materias
+
+### Obtener una materia por id (200)
+GET {{url}}/materias/1
+
+### Obtener una materia inexistente (404)
+GET {{url}}/materias/999
+
+### Obtener una materia con id no numerico (400)
+GET {{url}}/materias/1abc
+
+### Renombrar una materia (200)
+PUT {{url}}/materias/3
+Content-Type: application/json
+
+{
+  "nombre": "Inglés Técnico II"
+}
+
+### Actualizar una materia conservando su propio nombre (200)
+PUT {{url}}/materias/3
+Content-Type: application/json
+
+{
+  "nombre": "Inglés Técnico II"
+}
+
+### Actualizar una materia con el nombre de otra (409)
+PUT {{url}}/materias/2
+Content-Type: application/json
+
+{
+  "nombre": "Programación IV"
+}
+
+### Actualizar una materia inexistente (404)
+PUT {{url}}/materias/999
+Content-Type: application/json
+
+{
+  "nombre": "Estadística"
+}
+
+### Actualizar una materia con id invalido (400)
+PUT {{url}}/materias/1abc
+Content-Type: application/json
+
+{
+  "nombre": "Estadística"
+}
+
+# ------------------------- CALIFICACIONES -------------------------
+
+### Crear la calificacion 1 (201)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 1,
+  "notas": [7, 8.5, 9]
+}
+
+### Crear la calificacion 2: la misma alumna en otra materia (201)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 2,
+  "notas": [6, 6, 7]
+}
+
+### Crear la calificacion 3: otro alumno en la misma materia (201)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Luis Pérez",
+  "materiaId": 1,
+  "notas": [4, 5, 6.25]
+}
+
+### Crear repitiendo la combinacion alumno y materia (409)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 1,
+  "notas": [10, 10, 10]
+}
+
+### Crear repitiendo la combinacion en minusculas, sin tilde y con espacios (409)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "  ana    garcia ",
+  "materiaId": 1,
+  "notas": [10, 10, 10]
+}
+
+### Crear con una materia que no existe (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 999,
+  "notas": [7, 7, 7]
+}
+
+### Crear sin el nombre del alumno (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "materiaId": 1,
+  "notas": [7, 7, 7]
+}
+
+### Crear con el nombre del alumno vacio (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "   ",
+  "materiaId": 1,
+  "notas": [7, 7, 7]
+}
+
+### Crear con un nombre de alumno que contiene numeros (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta D1az",
+  "materiaId": 1,
+  "notas": [7, 7, 7]
+}
+
+### Crear con un nombre de alumno que no es texto (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": 123,
+  "materiaId": 1,
+  "notas": [7, 7, 7]
+}
+
+### Crear sin la materia (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "notas": [7, 7, 7]
+}
+
+### Crear con la materia como texto (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": "1",
+  "notas": [7, 7, 7]
+}
+
+### Crear sin las notas (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1
+}
+
+### Crear con dos notas (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [7, 7]
+}
+
+### Crear con cuatro notas (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [7, 7, 7, 7]
+}
+
+### Crear con notas que no son un arreglo (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": 7
+}
+
+### Crear con una nota como texto (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": ["7", 7, 7]
+}
+
+### Crear con una nota mayor que 10 (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [11, 7, 7]
+}
+
+### Crear con una nota negativa (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [-1, 7, 7]
+}
+
+### Crear con una nota de tres decimales (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [7.555, 7, 7]
+}
+
+### Crear sin body (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+### Crear con un JSON mal formado (400)
+POST {{url}}/calificaciones
+Content-Type: application/json
+
+{ "alumno": "Marta Díaz", }
+
+### Listar todas las calificaciones (200)
+GET {{url}}/calificaciones
+
+### Listar las calificaciones de una materia (200)
+GET {{url}}/calificaciones?materiaId=1
+
+### Listar las calificaciones de un alumno, sin tilde ni mayusculas (200)
+GET {{url}}/calificaciones?alumno=ana%20garcia
+
+### Listar combinando los dos filtros (200)
+GET {{url}}/calificaciones?alumno=Ana%20Garc%C3%ADa&materiaId=2
+
+### Filtrar con una materia no numerica (400)
+GET {{url}}/calificaciones?materiaId=abc
+
+### Filtrar con el alumno vacio (400)
+GET {{url}}/calificaciones?alumno=
+
+### Filtrar repitiendo el parametro (400)
+GET {{url}}/calificaciones?materiaId=1&materiaId=2
+
+### Filtrar con un parametro desconocido (400)
+GET {{url}}/calificaciones?materia=1
+
+### Obtener una calificacion por id (200)
+GET {{url}}/calificaciones/1
+
+### Obtener una calificacion inexistente (404)
+GET {{url}}/calificaciones/999
+
+### Obtener una calificacion con id no numerico (400)
+GET {{url}}/calificaciones/1abc
+
+### Corregir las notas conservando alumno y materia (200)
+PUT {{url}}/calificaciones/1
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 1,
+  "notas": [8, 8.5, 10]
+}
+
+### Cambiar un registro a otra materia (200)
+PUT {{url}}/calificaciones/3
+Content-Type: application/json
+
+{
+  "alumno": "Luis Pérez",
+  "materiaId": 2,
+  "notas": [4, 5, 6.25]
+}
+
+### Actualizar hacia una combinacion que ya existe (409)
+PUT {{url}}/calificaciones/3
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 1,
+  "notas": [4, 5, 6.25]
+}
+
+### Actualizar con una materia que no existe (400)
+PUT {{url}}/calificaciones/1
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 999,
+  "notas": [8, 8.5, 10]
+}
+
+### Actualizar con notas invalidas (400)
+PUT {{url}}/calificaciones/1
+Content-Type: application/json
+
+{
+  "alumno": "Ana García",
+  "materiaId": 1,
+  "notas": [8, 8.5]
+}
+
+### Actualizar una calificacion inexistente (404)
+PUT {{url}}/calificaciones/999
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [7, 7, 7]
+}
+
+### Actualizar una calificacion con id invalido (400)
+PUT {{url}}/calificaciones/1abc
+Content-Type: application/json
+
+{
+  "alumno": "Marta Díaz",
+  "materiaId": 1,
+  "notas": [7, 7, 7]
+}
+
+# -------------------------- ELIMINACIONES -------------------------
+
+### Eliminar una materia que tiene calificaciones (409)
+DELETE {{url}}/materias/1
+
+### Eliminar una materia sin calificaciones (200)
+DELETE {{url}}/materias/3
+
+### Eliminar una materia inexistente (404)
+DELETE {{url}}/materias/999
+
+### Eliminar una materia con id invalido (400)
+DELETE {{url}}/materias/1abc
+
+### Eliminar una calificacion (200)
+DELETE {{url}}/calificaciones/2
+
+### Eliminar la misma calificacion otra vez (404)
+DELETE {{url}}/calificaciones/2
+
+### Eliminar una calificacion con id invalido (400)
+DELETE {{url}}/calificaciones/1abc
+
+### Consultar una ruta que no existe (404)
+GET {{url}}/alumnos
